@@ -1,0 +1,62 @@
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('https://assets.website-files.com/6009ec8cda7f305645c9d91b/60176f9bb43e36419997ecfe_PPNeueMontreal-Book.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('https://assets.website-files.com/6009ec8cda7f305645c9d91b/60176f9b39c5673e51a86f5a_PPNeueMontreal-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Mondwest';
+  src: url('/PPMondwest-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@import "tailwindcss";
+
+@theme {
+  --color-orange-primary: #FF6B00;
+  --color-orange-dark: #E65A00;
+  --color-orange-light: #FFF5F0;
+  --font-sans: 'PP Neue Montreal', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'PP Mondwest', ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+@media (max-width: 768px) {
+  .animate-marquee {
+    animation-duration: 15s;
+  }
+}
+
+/* Custom selection color */
+::selection {
+  background-color: #FF6B00;
+  color: white;
+}
