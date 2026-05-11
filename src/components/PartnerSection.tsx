@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Button } from './Button';
+import { Link } from 'react-router-dom';
 
 const GIF_URLS = [
   'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
@@ -86,14 +87,16 @@ export const PartnerSection = () => {
           Recomece sua <span className="text-[#FF6B00] italic underline decoration-wavy">história</span>
         </h2>
         
-        <Button className="relative z-20 gap-4 !px-10 !py-6 text-2xl shadow-2xl">
-          <img 
-            src="https://local-teal-zxrq6owhba.edgeone.app/028c7d38-ac77-41e5-97ed-e6389f84505a.jpg" 
-            alt="Thay"
-            className="w-14 h-14 rounded-full object-cover border-2 border-white/50 shadow-lg"
-          />
-          <span>RECOMEÇAR AGORA</span>
-        </Button>
+        <Link to="/auth">
+          <Button className="relative z-20 gap-4 !px-10 !py-6 text-2xl shadow-2xl">
+            <img 
+              src="https://local-teal-zxrq6owhba.edgeone.app/028c7d38-ac77-41e5-97ed-e6389f84505a.jpg" 
+              alt="Thay"
+              className="w-14 h-14 rounded-full object-cover border-2 border-white/50 shadow-lg"
+            />
+            <span>RECOMEÇAR AGORA</span>
+          </Button>
+        </Link>
 
         <style>{`
           @keyframes fadeOutScale {

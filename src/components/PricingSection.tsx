@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { useInViewAnimation } from '../hooks/useInViewAnimation';
 import { Button } from './Button';
+import { Link } from 'react-router-dom';
 
 export const PricingSection = () => {
   const { ref: card1Ref } = useInViewAnimation();
@@ -49,7 +50,9 @@ export const PricingSection = () => {
               <p className="text-xs uppercase font-bold tracking-widest opacity-60 mb-2">Garantia Blindada</p>
               <p className="text-sm font-semibold">7 dias de satisfação ou seu dinheiro de volta.</p>
             </div>
-            <Button variant="tertiary" className="w-full py-5 text-xl font-bold text-[#FF6B00]">QUERO RECOMEÇAR AGORA</Button>
+            <Link to="/auth">
+              <Button variant="tertiary" className="w-full py-5 text-xl font-bold text-[#FF6B00]">QUERO RECOMEÇAR AGORA</Button>
+            </Link>
           </div>
         </motion.div>
 

@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user status and role.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "isPaid": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "isPaid", "displayName"]
+    },
+    "Content": {
+      "title": "Lesson Content",
+      "description": "Lesson videos and descriptions.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "textContent": { "type": "string" },
+        "type": { "type": "string", "enum": ["video", "text", "both"] },
+        "isFree": { "type": "boolean" },
+        "moduleName": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "type", "isFree", "moduleName", "order", "description", "updatedAt"]
+    },
+    "News": {
+      "title": "News/Announcement",
+      "description": "General news or announcements.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "createdAt"]
+    },
+    "Progress": {
+      "title": "User Progress",
+      "description": "Tracks completed lessons.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "contentId": { "type": "string" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "contentId", "completedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile data."
+    },
+    "/contents/{contentId}": {
+      "schema": "Content",
+      "description": "Course content lessons."
+    },
+    "/news/{newsId}": {
+      "schema": "News",
+      "description": "Announcements."
+    },
+    "/progress/{progressId}": {
+      "schema": "Progress",
+      "description": "Lesson completion tracking."
+    }
+  }
+}

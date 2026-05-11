@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isBootstrapAdmin() {
+      return isSignedIn() && (
+        request.auth.token.get('email', '') == 'systen3@gmail.com' || 
+        request.auth.token.get('email', '') == 'thairessantos861@gmail.com'
+      );
+    }
+
+    function isAdmin() {
+      return isBootstrapAdmin() || exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Entities Validation ---
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'role', 'isPaid', 'createdAt']) &&
+             data.keys().size() == 6 &&
+             data.uid is string && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() <= 256 &&
+             data.displayName is string && data.displayName.size() <= 128 &&
+             data.role in ['user', 'admin'] &&
+             data.isPaid is bool &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidContent(data) {
+      return data.keys().hasAll(['title', 'description', 'type', 'isFree', 'moduleName', 'order', 'createdAt', 'updatedAt']) &&
+             data.title is string && data.title.size() <= 256 &&
+             data.description is string && data.description.size() <= 5000 &&
+             data.type in ['video', 'text', 'both'] &&
+             data.isFree is bool &&
+             data.moduleName is string && data.moduleName.size() <= 128 &&
+             data.order is number &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp &&
+             (!data.keys().hasAll(['videoUrl']) || (data.videoUrl is string && data.videoUrl.size() <= 1024)) &&
+             (!data.keys().hasAll(['textContent']) || (data.textContent is string && data.textContent.size() <= 20000));
+    }
+
+    function isValidNews(data) {
+      return data.keys().hasAll(['title', 'content', 'createdAt']) &&
+             data.title is string && data.title.size() <= 256 &&
+             data.content is string && data.content.size() <= 10000 &&
+             data.createdAt is timestamp &&
+             (!data.keys().hasAll(['imageUrl']) || (data.imageUrl is string && data.imageUrl.size() <= 1024));
+    }
+
+    function isValidProgress(data) {
+      return data.keys().hasAll(['uid', 'contentId', 'completedAt']) &&
+             data.keys().size() == 3 &&
+             data.uid == request.auth.uid &&
+             data.contentId is string && data.contentId.size() <= 128 &&
+             data.completedAt is timestamp;
+    }
+
+    // --- Matches ---
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && isOwner(userId) && isValidUser(incoming()) && incoming().role == 'user' && incoming().isPaid == false;
+      allow update: if (isAdmin() && (isValidUser(incoming()) || incoming().diff(existing()).affectedKeys().hasOnly(['isPaid']))) || (isOwner(userId) && isValidUser(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['displayName']));
+    }
+
+    match /contents/{contentId} {
+      allow list: if isSignedIn();
+      allow get: if isSignedIn() && (existing().isFree == true || isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isPaid == true);
+      allow create, update: if isAdmin() && isValidContent(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isBootstrapAdmin();
+    }
+
+    match /news/{newsId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() && isValidNews(incoming());
+    }
+
+    match /progress/{progressId} {
+      allow list: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isSignedIn() && isValidProgress(incoming());
+      allow delete: if isSignedIn() && existing().uid == request.auth.uid;
+    }
+  }
+}
